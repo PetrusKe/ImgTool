@@ -84,7 +84,7 @@ def __resize_process(pathfile, height, width, mode, inter):
 
 def __file_split(pathfile, process_num):
     if process_num <= 1:
-        return [pathfile]
+        return [pathfile], 1
     elif process_num > __MAX_PROCESS:
         process_num = __MAX_PROCESS
 
@@ -119,10 +119,9 @@ def __resize_check(pathfile, height, width, mode):
 
 
 def __quit(signum, frame):
+    # http://stackoverflow.com/questions/26578799/python-send-sigint-to-subprocess-using-os-kill-as-if-pressing-ctrlc
     pid = os.getpid()
-    os.kill(pid, signal.CTRL_C_EVENT)
-    sys.stdout.write('quit.')
-    sys.exit()
+    os.kill(pid, signal.CTRL_BREAK_EVENT)
 
 
 if __name__ == '__main__':
