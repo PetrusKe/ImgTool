@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="86816b43-4826-42c1-b476-a4611de9f9a0" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/dictionaries/v_zhke.xml" afterPath="$PROJECT_DIR$/.idea/dictionaries/v_zhke.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/imgtool.py" afterPath="$PROJECT_DIR$/imgtool.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test.py" afterPath="$PROJECT_DIR$/test.py" />
     </list>
@@ -25,14 +25,14 @@
   </component>
   <component name="ExecutionTargetManager" SELECTED_TARGET="default_target" />
   <component name="FileEditorManager">
-    <splitter split-orientation="horizontal" split-proportion="0.41285715">
+    <splitter split-orientation="horizontal" split-proportion="0.31">
       <split-first>
         <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
           <file leaf-file-name="test.py" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/test.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="448">
-                  <caret line="34" column="24" lean-forward="true" selection-start-line="34" selection-start-column="24" selection-end-line="34" selection-end-column="24" />
+                <state relative-caret-position="304">
+                  <caret line="25" column="12" lean-forward="true" selection-start-line="25" selection-start-column="12" selection-end-line="25" selection-end-column="12" />
                   <folding>
                     <element signature="e#78#108#0" expanded="true" />
                   </folding>
@@ -67,11 +67,21 @@
           <file leaf-file-name="imgtool.py" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/imgtool.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="781">
-                  <caret line="131" column="0" lean-forward="true" selection-start-line="131" selection-start-column="0" selection-end-line="131" selection-end-column="0" />
+                <state relative-caret-position="747">
+                  <caret line="140" column="57" lean-forward="false" selection-start-line="140" selection-start-column="57" selection-end-line="140" selection-end-column="57" />
                   <folding>
                     <element signature="e#0#9#0" expanded="true" />
                   </folding>
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="signal.py" pinned="false" current-in-tab="false">
+            <entry file="file://D:/program/Anaconda3_2.3.0/envs/cntk-py35/Lib/signal.py">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="427">
+                  <caret line="45" column="4" lean-forward="false" selection-start-line="45" selection-start-column="4" selection-end-line="45" selection-end-column="4" />
+                  <folding />
                 </state>
               </provider>
             </entry>
@@ -695,14 +705,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://D:/program/Anaconda3_2.3.0/envs/cntk-py35/Lib/signal.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="640">
-          <caret line="45" column="4" lean-forward="false" selection-start-line="45" selection-start-column="4" selection-end-line="45" selection-end-column="4" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://D:/program/Anaconda3_2.3.0/envs/cntk-py35/Lib/re.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="2048">
@@ -737,11 +739,19 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/test.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="448">
-          <caret line="34" column="24" lean-forward="true" selection-start-line="34" selection-start-column="24" selection-end-line="34" selection-end-column="24" />
+        <state relative-caret-position="304">
+          <caret line="25" column="12" lean-forward="true" selection-start-line="25" selection-start-column="12" selection-end-line="25" selection-end-column="12" />
           <folding>
             <element signature="e#78#108#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://D:/program/Anaconda3_2.3.0/envs/cntk-py35/Lib/signal.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="427">
+          <caret line="45" column="4" lean-forward="false" selection-start-line="45" selection-start-column="4" selection-end-line="45" selection-end-column="4" />
+          <folding />
         </state>
       </provider>
     </entry>
@@ -763,8 +773,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/imgtool.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="781">
-          <caret line="131" column="0" lean-forward="true" selection-start-line="131" selection-start-column="0" selection-end-line="131" selection-end-column="0" />
+        <state relative-caret-position="747">
+          <caret line="140" column="57" lean-forward="false" selection-start-line="140" selection-start-column="57" selection-end-line="140" selection-end-column="57" />
           <folding>
             <element signature="e#0#9#0" expanded="true" />
           </folding>

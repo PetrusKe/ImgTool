@@ -35,6 +35,7 @@ def printB():
 def quit(signum, frame):
     id1 = os.getpid()
     os.kill(id1, signal.CTRL_BREAK_EVENT)
+    # os.kill(id1, signal.CTRL_C_EVENT)   # need sleep thread.
     # os.popen('TASKKILL /F /PID ' + str(id1))
 
 
