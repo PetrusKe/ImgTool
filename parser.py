@@ -46,5 +46,5 @@ if __name__ == '__main__':
     # parser = init_parser()
     # args = vars(parser.parse_args())
     s = time.time()
-    OPES['resize']('C:\\Dataset\\ImageNet_CNTK\\val_map.txt', 256, 256, process_num=8)
+    OPES['resize']('C:\\Users\\kezha\\Pictures\\test\\out.txt', 256, 256, process_num=2)
     print('total time: ', time.time() - s)

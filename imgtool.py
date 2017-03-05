@@ -5,6 +5,7 @@ import cv2
 import signal
 import threading
 import time
+import shutil
 import multiprocessing
 from functools import partial
 
@@ -31,6 +32,8 @@ SUPPORT_FORMAT = [
 
 __MAX_PROCESS = 16
 
+__TMP_SUFFIX = '_tmp'
+
 
 def resize(pathfile, height, width, process_num=1, mode=cv2.IMREAD_COLOR, inter=cv2.INTER_LINEAR, breakpoint=True):
     def __check(pathfile, height, width, mode):
@@ -45,7 +48,8 @@ def resize(pathfile, height, width, process_num=1, mode=cv2.IMREAD_COLOR, inter=
             sys.exit()
 
     __check(pathfile, height, width, mode)
-    pathfiles, process_num = __file_split(pathfile, process_num)
+
+    pathfiles, process_num = __file_split(pathfile, process_num, breakpoint)
 
     # signal.signal(signal.SIGINT, __quit)
     process_pool = multiprocessing.Pool(process_num)
@@ -107,9 +111,19 @@ def __resize_process(pathfile, height, width, mode, inter, breakpoint):
     __file_delete(pathfile)
 
 
-def __file_split(filepath, process_num):
+def __file_split(filepath, process_num, breakpoint):
+    tmp_folder = os.path.split(filepath)[0] + '\\' + __TMP_SUFFIX
+    if breakpoint:
+        if os.path.isdir(tmp_folder) and os.listdir(tmp_folder):
+            # 断点续传，设置线程数量
+            return
+
+    if os.path.isdir(tmp_folder):
+        shutil.rmtree(tmp_folder)
+    os.makedirs(tmp_folder)
+
     if process_num <= 1:
-        return [filepath], 1
+        return [filepath], 1            # 要copy到新文件夹创建
     elif process_num > __MAX_PROCESS:
         process_num = __MAX_PROCESS
 
@@ -118,14 +132,15 @@ def __file_split(filepath, process_num):
         context = file.readlines()
     lines = len(context) // process_num
 
-    for num in range(process_num - 1):
-        path = filepath + '_tmp' + str(num)
+    for num in range(1, process_num):
+        path = tmp_folder + '\\' + __TMP_SUFFIX + str(num)
         with open(path, 'w') as file:
-            file.writelines(context[lines * num:lines * (num + 1)])
+            file.writelines(context[lines * num:lines * num])
         file_list.append(path)
-    path = filepath + '_tmp' + str(num + 1)
+    assert (num + 1) == process_num
+    path = tmp_folder + '\\' + __TMP_SUFFIX + str(process_num)
     with open(path, 'w') as file:
-        file.writelines(context[lines * (num + 1):])
+        file.writelines(context[lines * process_num:])
     file_list.append(path)
 
     return file_list, process_num

@@ -1,14 +1,22 @@
 import os
 import re
-filepath = 'D:\\Share\\'
+
+filepath = 'C:\\Users\\kezha\\Pictures\\test\\'
 infilepath = filepath + 'val_map.txt'
-outfilepath = filepath + 'out.txt'
+outfilepath = filepath + '\\277.jpg'
 
-outfile = open(outfilepath, 'w')
+print(os.path.split(outfilepath))
 
-with open(infilepath, 'r') as infile:
-    for line in infile.readlines():
-        outfile.write(str(line).split()[0]+'\n')
+print(os.path.pardir)
+# if os.path.isdir(filepath):
+#     filenames = os.listdir(filepath)
+#     for filename in filenames:
+#         outfile.write(filepath + '\\' + filename + '\n')
+#
+#     outfile.close()
 
 
-outfile.close()
+import shutil
+print(os.path.isdir(outfilepath))
+if os.path.isdir(filepath):
+    shutil.rmtree(filepath)
