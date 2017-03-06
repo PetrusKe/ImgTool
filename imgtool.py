@@ -3,22 +3,18 @@ import sys
 import re
 import cv2
 import signal
-import threading
 import time
 import shutil
 import multiprocessing
-from functools import partial
 
 __all__ = [
     'SUPPORT_FORMAT',
+    'MAX_PROCESS',
     'resize',
+
 ]
 
-__FORMAT_ERROR = '[Error] Not support format in file: '
-__NOFILE_ERROR = '[Error] No such file: '
-__IMREAD_ERROR = '[Error] Can not load file: '
-
-__EXPEND_WARNING = '[Warning] Expend origin image: '
+MAX_PROCESS = 16
 
 SUPPORT_FORMAT = [
     'bmp', 'dib',
@@ -30,35 +26,43 @@ SUPPORT_FORMAT = [
     'tiff', 'tif'
 ]
 
-__MAX_PROCESS = 16
+__FORMAT_ERROR = '[Error] Not support format in file: '
+__NOFILE_ERROR = '[Error] No such file: '
+__IMREAD_ERROR = '[Error] Can not load file: '
+__TMPFILE_ERROR = '[Error] Fail to copy tmp file: '
+__EXPEND_WARNING = '[Warning] Expend origin image: '
 
 __TMP_SUFFIX = '_tmp'
 
 
 def resize(pathfile, height, width, process_num=1, mode=cv2.IMREAD_COLOR, inter=cv2.INTER_LINEAR, breakpoint=True):
-    def __check(pathfile, height, width, mode):
-        if not os.path.isfile(pathfile):
-            # handle error
-            sys.exit()
-        if height < 0 or width < 0:
-            sys.stderr.write('')
-            sys.exit()
-        if mode == cv2.IMREAD_UNCHANGED:
-            sys.stderr.write('Now not support BGR-D image')
-            sys.exit()
+    if not os.path.isfile(pathfile):
+        # handle error
+        sys.exit()
+    if height < 0 or width < 0:
+        sys.stderr.write('')
+        sys.exit()
+    if mode == cv2.IMREAD_UNCHANGED:
+        sys.stderr.write('Now not support BGR-D image')
+        sys.exit()
 
-    __check(pathfile, height, width, mode)
+    parallel_args = __file_split(pathfile, process_num, breakpoint)
+    __parallel_handle(parallel_args, __resize_process, (pathfile, height, width, mode, inter, breakpoint))
 
-    pathfiles, process_num = __file_split(pathfile, process_num, breakpoint)
+    tmp_folder = os.path.split(pathfile)[0] + '\\' + __TMP_SUFFIX
+    if os.listdir(tmp_folder):
+        sys.stdout.write('Stop images resize.\n')
+        return
+
+    shutil.rmtree(tmp_folder, ignore_errors=True)  # fixme: handle errors?
+    sys.stdout.write('Finish all images resize.\n')
 
     # signal.signal(signal.SIGINT, __quit)
-    process_pool = multiprocessing.Pool(process_num)
-    for index, pathfile in enumerate(pathfiles):
-        process_pool.apply_async(__resize_process, args=(pathfile, height, width, mode, inter, breakpoint))
-    process_pool.close()
-    process_pool.join()
-
-    sys.stdout.write('Finish all image resize.\n')
+    # process_pool = multiprocessing.Pool(process_num)
+    # for index, pathfile in enumerate(pathfiles):
+    #     process_pool.apply_async(__resize_process, args=(pathfile, height, width, mode, inter, breakpoint))
+    # process_pool.close()
+    # process_pool.join()
 
 
 def __resize_process(pathfile, height, width, mode, inter, breakpoint):
@@ -69,7 +73,9 @@ def __resize_process(pathfile, height, width, mode, inter, breakpoint):
         else:
             __file_delete(pathfile)
         time.sleep(0.5)
-        # http://stackoverflow.com/questions/26578799/python-send-sigint-to-subprocess-using-os-kill-as-if-pressing-ctrlc
+        # reference:
+        # http://stackoverflow.com/questions/26578799
+        # /python-send-sigint-to-subprocess-using-os-kill-as-if-pressing-ctrlc
         pid = os.getpid()
         os.kill(pid, signal.CTRL_BREAK_EVENT)
 
@@ -115,17 +121,31 @@ def __file_split(filepath, process_num, breakpoint):
     tmp_folder = os.path.split(filepath)[0] + '\\' + __TMP_SUFFIX
     if breakpoint:
         if os.path.isdir(tmp_folder) and os.listdir(tmp_folder):
-            # 断点续传，设置线程数量
-            return
+            # TODO: breakpoint load need test
+            tmp_files = [files for roots, dirs, files in os.walk(tmp_folder)][0]
+            process_num = len(tmp_files)
+            file_list = []
+            for file in tmp_files:
+                path = tmp_folder + '\\' + file
+                file_list.append(path)
+            assert len(file_list) == process_num
+            return (file_list, process_num)
 
     if os.path.isdir(tmp_folder):
         shutil.rmtree(tmp_folder)
     os.makedirs(tmp_folder)
 
     if process_num <= 1:
-        return [filepath], 1            # 要copy到新文件夹创建
-    elif process_num > __MAX_PROCESS:
-        process_num = __MAX_PROCESS
+        process_num = 1
+        path = tmp_folder + '\\' + __TMP_SUFFIX + str(process_num)
+        try:
+            shutil.copyfile(filepath, path)
+        except shutil.SameFileError:
+            sys.stderr.write(__TMPFILE_ERROR + filepath)
+        return ([path], process_num)
+
+    elif process_num > MAX_PROCESS:
+        process_num = MAX_PROCESS
 
     file_list = []
     with open(filepath, 'r') as file:
@@ -143,12 +163,21 @@ def __file_split(filepath, process_num, breakpoint):
         file.writelines(context[lines * process_num:])
     file_list.append(path)
 
-    return file_list, process_num
+    return (file_list, process_num)
 
 
 def __file_delete(filepath):
     if os.path.isfile(filepath):
         os.remove(filepath)
+
+
+def __parallel_handle(parallel_args, func, func_args):
+    # TODO: need test
+    process_pool = multiprocessing.Pool(parallel_args[1])
+    for index, pathfile in enumerate(parallel_args[0]):
+        process_pool.apply_async(func, args=func_args)
+    process_pool.close()
+    process_pool.join()
 
 
 if __name__ == '__main__':
