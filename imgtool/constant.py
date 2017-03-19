@@ -1,7 +1,8 @@
 __all__ = [
     'MAX_PROCESS',
     'SUPPORT_FORMAT',
-    'TMP_SUFFIX',
+    'TMP_FOLDER',
+    'TMP_IMG_FOLDER',
     'ERROR',
     'WARNING',
 ]
@@ -18,7 +19,8 @@ SUPPORT_FORMAT = [
     'tiff', 'tif',
 ]
 
-TMP_SUFFIX = '_tmp'
+TMP_FOLDER = '_tmp'
+TMP_IMG_FOLDER = '_img'
 
 ERROR = {
     'format_error': '[Error] Not support format in file: ',

@@ -6,7 +6,7 @@ from .constant import *
 
 
 def file_split(filepath, process_num, breakpoint):
-    tmp_folder = os.path.split(filepath)[0] + '\\' + TMP_SUFFIX
+    tmp_folder = os.path.split(filepath)[0] + '\\' + TMP_FOLDER
     if breakpoint:
         if os.path.isdir(tmp_folder) and os.listdir(tmp_folder):
             # TODO: breakpoint load need test
@@ -27,7 +27,7 @@ def file_split(filepath, process_num, breakpoint):
 
     if process_num <= 1:
         process_num = 1
-        path = tmp_folder + '\\' + TMP_SUFFIX + str(process_num)
+        path = tmp_folder + '\\' + TMP_FOLDER + str(process_num)
         try:
             shutil.copyfile(filepath, path)
         except shutil.SameFileError:
@@ -43,13 +43,13 @@ def file_split(filepath, process_num, breakpoint):
     lines = len(context) // process_num
 
     for num in range(1, process_num):
-        path = tmp_folder + '\\' + TMP_SUFFIX + str(num)
+        path = tmp_folder + '\\' + TMP_FOLDER + str(num)
         with open(path, 'w') as file:
             file.writelines(context[lines * (num - 1):lines * num])
         file_list.append(path)
 
     assert (num + 1) == process_num
-    path = tmp_folder + '\\' + TMP_SUFFIX + str(process_num)
+    path = tmp_folder + '\\' + TMP_FOLDER + str(process_num)
     with open(path, 'w') as file:
         file.writelines(context[lines * num:])
     file_list.append(path)
