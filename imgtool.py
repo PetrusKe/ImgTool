@@ -5,13 +5,11 @@ import cv2
 import signal
 import time
 import shutil
+import logging
 import multiprocessing
-
+import scipy
 __all__ = [
-    'SUPPORT_FORMAT',
-    'MAX_PROCESS',
     'resize',
-
 ]
 
 MAX_PROCESS = 16
@@ -35,7 +33,11 @@ __EXPEND_WARNING = '[Warning] Expend origin image: '
 __TMP_SUFFIX = '_tmp'
 
 
-def resize(pathfile, height, width, process_num=1, mode=cv2.IMREAD_COLOR, inter=cv2.INTER_LINEAR, breakpoint=True):
+def resize(pathfile, height, width, process_num=1, mode=cv2.IMREAD_COLOR,
+           inter=cv2.INTER_LINEAR, breakpoint=True, islog=True):
+
+    __logging_init(islog)
+
     if not os.path.isfile(pathfile):
         # handle error
         sys.exit()
@@ -43,6 +45,7 @@ def resize(pathfile, height, width, process_num=1, mode=cv2.IMREAD_COLOR, inter=
         sys.stderr.write('')
         sys.exit()
     if mode == cv2.IMREAD_UNCHANGED:
+        logging.warning('')
         sys.stderr.write('Now not support BGR-D image')
         sys.exit()
 
@@ -178,6 +181,17 @@ def __parallel_handle(parallel_args, func, func_args):
         process_pool.apply_async(func, args=func_args)
     process_pool.close()
     process_pool.join()
+
+
+def __logging_init(islog):
+    if islog:
+        logging.basicConfig(level=logging.INFO,
+                            filename='./log',
+                            filemode='w',
+                            format='%(asctime)s - %(filename)s - %(levelname)s: %(message)s')
+    else:
+        logging.basicConfig(level=logging.INFO,
+                            format='%(asctime)s - %(filename)s - %(levelname)s: %(message)s')
 
 
 if __name__ == '__main__':
