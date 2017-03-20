@@ -4,14 +4,13 @@ import cv2
 
 if __name__ == '__main__':
     size = 30
-    imgtool.resize('C:\\Users\\Zhanghan Ke\\Downloads\\imgtool_test\\index.txt',
-                   'C:\\Users\\Zhanghan Ke\\Downloads\\imgtool_test\\out\\',
-                   size, size, process_num=8,
-                   breakpoint=True)
+    inputs = ''
+    outputs = ''
+    eval_path = ''
+    imgtool.resize(inputs, outputs, size, size, process_num=8, breakpoint=True)
 
     print('eval...')
-
-    folder = 'C:\\Users\\Zhanghan Ke\\Downloads\\imgtool_test\\test\\'
+    folder = eval_path
     l = os.listdir(folder)
     index = 0
     error = 0

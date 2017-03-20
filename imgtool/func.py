@@ -1,6 +1,5 @@
-import os, sys, time, signal, re, shutil
+import os, sys, signal, re, shutil
 import cv2, logging, multiprocessing
-from copy import deepcopy
 from PIL import Image
 from . import util
 from .constant import *
@@ -15,7 +14,7 @@ def resize(pathfile, outpath, height, width, process_num=1, mode=cv2.IMREAD_COLO
     signal.signal(signal.SIGINT, signal.SIG_IGN)
 
     if not os.path.isfile(pathfile):
-        # handle error
+        sys.stderr.write('')
         sys.exit()
     if height < 0 or width < 0:
         sys.stderr.write('')
@@ -31,10 +30,9 @@ def resize(pathfile, outpath, height, width, process_num=1, mode=cv2.IMREAD_COLO
     if parallel_args[1] > 0:
         print('start...')
         process_pool = multiprocessing.Pool(parallel_args[1])
-
         for index, file in enumerate(parallel_args[0]):
-            process_pool.apply_async(__resize_process,
-                                     args=(file, tmp_folder, outpath, height, width, mode, inter, breakpoint))
+            args = (file, tmp_folder, outpath, height, width, mode, inter, breakpoint)
+            process_pool.apply_async(__resize_process, args=args)
         process_pool.close()
         process_pool.join()
 
@@ -45,11 +43,6 @@ def resize(pathfile, outpath, height, width, process_num=1, mode=cv2.IMREAD_COLO
 
 def __resize_process(pathfile, tmp_folder, output, height, width, mode, inter, breakpoint):
     def __quit(signum, frame):
-        # if backup['tag'] and backup['cur_img'] is not None:
-        #     context = backup['cur_context']
-        #     cv2.imwrite(backup['cur_img_path'], backup['cur_img'])
-        # util.file_delete(backup['cur_img_path'] + TMP_SUFFIX)
-
         if breakpoint and len(context):
             context.reverse()
             with open(pathfile, 'w') as file:
@@ -64,28 +57,18 @@ def __resize_process(pathfile, tmp_folder, output, height, width, mode, inter, b
 
     signal.signal(signal.SIGINT, __quit)
 
-    warning_list = []
-    error_list = []
-    with open(pathfile, 'r') as file:
-        context = file.readlines()
-
-    backup = {
-        'cur_context': None,
-        'cur_img_path': None,
-        'cur_img': None,
-        'tag': False,
-    }
-
     img_folder = tmp_folder + '\\' + TMP_IMG_FOLDER
     if not os.path.isdir(img_folder):
         os.makedirs(img_folder)
 
+    warning_list = []
+    error_list = []
+    with open(pathfile, 'r') as file:
+        context = file.readlines()
     context.reverse()
+
     for line in reversed(context):
-        backup['tag'] = False
-        backup['cur_context'] = deepcopy(context)
         img_path = line.strip()
-        backup['cur_img_path'] = deepcopy(img_path)
         img_name = re.split(r'/|\\', img_path)[-1]
         if img_name.split('.')[-1].lower() not in SUPPORT_FORMAT:
             error_list.append(ERROR['format_error'] + img_path)
@@ -97,21 +80,16 @@ def __resize_process(pathfile, tmp_folder, output, height, width, mode, inter, b
             continue
 
         tmp_img = img_folder + '\\' + img_name + TMP_FOLDER
-
         try:
             Image.open(img_path).verify()
         except:
             if os.path.isfile(tmp_img):
                 shutil.copy2(tmp_img, img_path)
             else:
-                print(pathfile + ': Err!' + img_path)  # TODO: why??
+                print(pathfile + ': Err!' + img_path)
                 continue
 
         ori_img = cv2.imread(img_path, mode)
-
-        backup['cur_img'] = deepcopy(ori_img)
-        backup['tag'] = True
-
         if ori_img.data is not None:
             if height == ori_img.shape[0] and width == ori_img.shape[1]:
                 util.file_delete(tmp_img)
@@ -119,7 +97,6 @@ def __resize_process(pathfile, tmp_folder, output, height, width, mode, inter, b
                 continue
             elif height > ori_img.shape[0] or width > ori_img.shape[1]:
                 warning_list.append(WARNING['expend_warning'] + img_path)
-
             img = cv2.resize(ori_img, (height, width), inter)
             cv2.imwrite(tmp_img, img)
             shutil.copy2(tmp_img, img_path)
